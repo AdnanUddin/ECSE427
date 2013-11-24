@@ -24,6 +24,7 @@ int mainLoop(int server_socket)
 		
 		//TODO: accept the connection from the client and assign the return value to client_socket
 		client_socket = socket(PF_INET,SOCK_STREAM,0);
+		printf("client_socket: %i \n",client_socket);
 
 		assert(client_socket != INVALID_SOCKET);
 
@@ -62,6 +63,8 @@ int start(int argc, char **argv)
 
 	int server_socket = INVALID_SOCKET;
 	//TODO: create a socket to listen the client requests and replace the value of server_socket with the socket's fd
+	create_server_tcp_socket(argc);
+	printf();
 
 	assert(server_socket != INVALID_SOCKET);
 	return mainLoop(server_socket);

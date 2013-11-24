@@ -10,20 +10,7 @@ int connect_to_nn(char* address, int port)
 	//TODO: create a socket and connect it to the server (address, port)
 	//assign return value to client_socket 
 	int client_socket = -1;
-	client_socket = socket(PF_INET,SOCK_STREAM,0);
-
-	
-	sockaddr_in sock_address ;
-	memcpy(&sock_address.sin_addr,address,sizeof(address));
-	sock_address.sin_family = AF_INET;
-	sock_address.sin_port = htons(port);
-	//inet_aton(address,&sock_address.sin_addr.s_addr);
-	
-	
-	int err = connect(client_socket,(struct sockaddr *)&sock_address,sizeof(sock_address));	
-	printf("client_socket: %i \n",client_socket);
-	printf("err: %i \n",err);
-	printf("address: %s\n",address);
+ 	client_socket = create_client_tcp_socket(address,port);
 	return client_socket;
 }
 

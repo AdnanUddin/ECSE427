@@ -63,6 +63,8 @@ int start(int argc, char **argv)
 
 	int server_socket = INVALID_SOCKET;
 	//TODO: create a socket to listen the client requests and replace the value of server_socket with the socket's fd
+	create_server_tcp_socket(argc);
+	printf("INSIDE namenode.c");
 
 	assert(server_socket != INVALID_SOCKET);
 	return mainLoop(server_socket);
