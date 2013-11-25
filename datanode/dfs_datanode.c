@@ -15,7 +15,8 @@ int mainLoop()
 	//we don't consider concurrent operations in this assignment
 	int server_socket = -1;
 	//TODO: create a server socket and listen on it, you can implement dfs_common.c and call it here
-
+	server_socket = create_tcp_socket();
+	listen(server_socket,5);
 	assert (server_socket != INVALID_SOCKET);
 
 	// Listen to requests from the clients
@@ -24,6 +25,7 @@ int mainLoop()
 		sockaddr_in client_address;
 		int client_socket = -1;
 		//TODO: accept the client request
+		client_socket = accept(server_socket,);
 		assert(client_socket != INVALID_SOCKET);
 		dfs_cli_dn_req_t request;
 		//TODO: receive data from client_socket, and fill it to request
@@ -44,6 +46,7 @@ static void *heartbeat()
 	{
 		int heartbeat_socket = -1;
 		//TODO: create a socket to the namenode, assign file descriptor id to heartbeat_socket
+		heartbeat_socket = create_tcp_socket();
 		assert(heartbeat_socket != INVALID_SOCKET);
 		//send datanode_status to namenode
 		close(heartbeat_socket);
@@ -68,7 +71,7 @@ int start(int argc, char **argv)
 	strcpy(working_directory, argv[4]);
 	//start one thread to report to the namenode periodically
 	//TODO: start a thread to report heartbeat
-
+	//create_thread(&heartbeat,NULL);
 	return mainLoop();
 }
 

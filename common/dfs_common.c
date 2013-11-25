@@ -10,7 +10,7 @@ inline pthread_t * create_thread(void * (*entry_point)(void*), void *args)
 {
 	//TODO: create the thread and run it
 	pthread_t * thread;
-	pthread_create(&thread,NULL,entry_point,&args);
+	pthread_create(thread,NULL,entry_point,args);
 	return thread;
 }
 
@@ -20,8 +20,9 @@ inline pthread_t * create_thread(void * (*entry_point)(void*), void *args)
 int create_tcp_socket()
 {
 	int sd;
-	sd = socket(PF_INET,SOCK_STREAM,0);
 	//TODO:create the socket and return the file descriptor 
+	sd = socket(AF_INET,SOCK_STREAM,0);
+	printf("sd = %i\n",sd );
 	return sd;
 }
 
@@ -52,6 +53,7 @@ int create_client_tcp_socket(char* address, int port)
  */
 int create_server_tcp_socket(int port)
 {
+	printf("create_server_tcp_socket\n");
 	assert(port >= 0 && port < 65536);
 	int socket = create_tcp_socket();
 	if (socket == INVALID_SOCKET) return 1;
@@ -63,7 +65,6 @@ int create_server_tcp_socket(int port)
 
 	if(bind(socket, (struct sockaddr*)&serv_addr,sizeof(serv_addr))<0) printf("fail on bind");
 	listen(socket,10);
-	int newsockfd = accept(socket,NULL,NULL);
 	
 	return socket;
 }
