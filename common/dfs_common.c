@@ -10,6 +10,9 @@ inline pthread_t * create_thread(void * (*entry_point)(void*), void *args)
 {
 	//TODO: create the thread and run it
 	pthread_t * thread;
+	pthread_create(thread,NULL,&entry_point,args);
+
+	pthread_exit(0);
 
 	return thread;
 }
@@ -20,7 +23,8 @@ inline pthread_t * create_thread(void * (*entry_point)(void*), void *args)
 int create_tcp_socket()
 {
 	//TODO:create the socket and return the file descriptor 
-	return -1;
+	int sd = socket(AF_INET,SOCK_STREAM,0);
+	return sd;
 }
 
 /**
@@ -33,6 +37,12 @@ int create_client_tcp_socket(char* address, int port)
 	int socket = create_tcp_socket();
 	if (socket == INVALID_SOCKET) return 1;
 	//TODO: connect it to the destination port
+	struct sockaddr_in serv_addr;
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = htons(port);
+	serv_addr.sin_addr.s_addr = inet_addr(address);
+
+	connect(socket,(struct sockaddr *)&serv_addr,sizeof(serv_addr));
 	return socket;
 }
 
