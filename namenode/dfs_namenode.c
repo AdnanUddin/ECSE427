@@ -21,11 +21,7 @@ int mainLoop(int server_socket)
 		sockaddr_in client_address;
 		unsigned int client_address_length = sizeof(client_address);
 		int client_socket = -1;
-		
 		//TODO: accept the connection from the client and assign the return value to client_socket
-		client_socket = socket(PF_INET,SOCK_STREAM,0);
-		printf("client_socket: %i \n",client_socket);
-		int newsockfd = accept(server_socket,(struct sockaddr *)&client_address,&client_address_length);
 
 		assert(client_socket != INVALID_SOCKET);
 
@@ -61,12 +57,9 @@ int start(int argc, char **argv)
 
 	//TODO:create a thread to handle heartbeat service
 	//you can implement the related function in dfs_common.c and call it here
-	// create_thread(&heartbeatService,NULL);
+
 	int server_socket = INVALID_SOCKET;
 	//TODO: create a socket to listen the client requests and replace the value of server_socket with the socket's fd
-	server_socket = create_tcp_socket();
-	//create_server_tcp_socket(argc);
-	printf("INSIDE namenode.c");
 
 	assert(server_socket != INVALID_SOCKET);
 	return mainLoop(server_socket);

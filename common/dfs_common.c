@@ -10,7 +10,7 @@ inline pthread_t * create_thread(void * (*entry_point)(void*), void *args)
 {
 	//TODO: create the thread and run it
 	pthread_t * thread;
-	pthread_create(thread,NULL,entry_point,args);
+
 	return thread;
 }
 
@@ -19,11 +19,8 @@ inline pthread_t * create_thread(void * (*entry_point)(void*), void *args)
  */
 int create_tcp_socket()
 {
-	int sd;
 	//TODO:create the socket and return the file descriptor 
-	sd = socket(AF_INET,SOCK_STREAM,0);
-	printf("sd = %i\n",sd );
-	return sd;
+	return -1;
 }
 
 /**
@@ -36,15 +33,6 @@ int create_client_tcp_socket(char* address, int port)
 	int socket = create_tcp_socket();
 	if (socket == INVALID_SOCKET) return 1;
 	//TODO: connect it to the destination port
-	struct sockaddr_in serv_addr;
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_port = htons(port);
-	serv_addr.sin_addr.s_addr = inet_addr(address);
-
-	if(connect(socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr))<0)
-	{
-		printf("error connection from client side\n");
-	}	
 	return socket;
 }
 
@@ -53,19 +41,10 @@ int create_client_tcp_socket(char* address, int port)
  */
 int create_server_tcp_socket(int port)
 {
-	printf("create_server_tcp_socket\n");
 	assert(port >= 0 && port < 65536);
 	int socket = create_tcp_socket();
 	if (socket == INVALID_SOCKET) return 1;
 	//TODO: listen on local port
-	struct sockaddr_in serv_addr;
-	serv_addr.sin_family = AF_INET;    
-	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY); 
-	serv_addr.sin_port = htons(port);    
-
-	if(bind(socket, (struct sockaddr*)&serv_addr,sizeof(serv_addr))<0) printf("fail on bind");
-	listen(socket,10);
-	
 	return socket;
 }
 

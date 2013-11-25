@@ -1,7 +1,5 @@
 #include "client/dfs_client.h"
 #include "datanode/ext.h"
-#include <sys/types.h>
-#include <sys/socket.h>clea
 
 int connect_to_nn(char* address, int port)
 {
@@ -10,7 +8,7 @@ int connect_to_nn(char* address, int port)
 	//TODO: create a socket and connect it to the server (address, port)
 	//assign return value to client_socket 
 	int client_socket = -1;
- 	client_socket = create_client_tcp_socket(address,port);
+	
 	return client_socket;
 }
 
@@ -75,7 +73,6 @@ int pull_file(int namenode_socket, const char *filename)
 
 dfs_system_status *get_system_info(int namenode_socket)
 {
-	printf("namenode_socket: %i\n",namenode_socket);
 	assert(namenode_socket != INVALID_SOCKET);
 	//TODO fill the result and send 
 	dfs_cm_client_req_t request;
