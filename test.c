@@ -233,14 +233,8 @@ int test_case_6(char **argv, int op_type)
 
 int test_case_7(char **argv) 
 {
-	char **args = (char **) malloc(sizeof(char *) * 3);
-	args[0] = argv[0];
-	args[1] = argv[1];
-	args[2] = "local_file";
 	int r2 = test_case_2(argv, 1024);
-	args[2] = "local_file_medium";
 	int r6 = test_case_4(argv, 4096);
-	args[2] = "local_file_large";
 	int r8	= test_case_6(argv, 8192);
 	return r2 || r6 || r8;
 }
@@ -295,7 +289,7 @@ void append_data(char *out_file, int append_size)
 		fputc(c, fp);
 	}
 	fclose(fp);
-	char *cmd = (char *) malloc(sizeof(char) * (strlen(out_file) * 2 + 6));
+	char *cmd = (char *) malloc(sizeof(char) * (strlen(out_file) * 2 + 7));
 	sprintf(cmd, "cp %s %s_1", out_file, out_file);
 	system(cmd);
 	free(cmd);
@@ -312,7 +306,7 @@ void generate_data(char *out_file, int file_size)
 		fputc(c, fp);
 	}
 	fclose(fp);
-	char *cmd = (char *) malloc(sizeof(char) * (strlen(out_file) * 2 + 6));
+	char *cmd = (char *) malloc(sizeof(char) * (strlen(out_file) * 2 + 7));
 	sprintf(cmd, "cp %s %s_1", out_file, out_file);
 	system(cmd);
 	free(cmd);

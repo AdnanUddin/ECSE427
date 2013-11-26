@@ -9,8 +9,8 @@
 inline pthread_t * create_thread(void * (*entry_point)(void*), void *args)
 {
 	//TODO: create the thread and run it
-	pthread_t * thread;
-	pthread_create(thread,NULL,&entry_point,args);
+	pthread_t * thread = (pthread_t *)malloc(sizeof(thread));
+	pthread_create(thread,NULL,entry_point,args);
 
 	pthread_exit(0);
 
@@ -55,6 +55,17 @@ int create_server_tcp_socket(int port)
 	int socket = create_tcp_socket();
 	if (socket == INVALID_SOCKET) return 1;
 	//TODO: listen on local port
+	struct sockaddr_in serv_addr;
+	memset(&serv_addr,'0',sizeof(serv_addr));
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	serv_addr.sin_port = htons(port);
+
+	bind(socket,(struct sockaddr*)&serv_addr,sizeof(serv_addr));
+	if(listen(socket,10) == -1) {
+		printf("create_server_tcp_socket() fail listen\n");
+		return -1;
+	}
 	return socket;
 }
 

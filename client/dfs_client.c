@@ -7,7 +7,7 @@ int connect_to_nn(char* address, int port)
 	assert(port >= 1 && port <= 65535);
 	//TODO: create a socket and connect it to the server (address, port)
 	//assign return value to client_socket 
-	int client_socket = -1;
+	int client_socket = create_client_tcp_socket(address,port);
 	
 	return client_socket;
 }

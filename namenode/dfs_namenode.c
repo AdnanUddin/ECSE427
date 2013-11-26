@@ -22,12 +22,12 @@ int mainLoop(int server_socket)
 		unsigned int client_address_length = sizeof(client_address);
 		int client_socket = -1;
 		//TODO: accept the connection from the client and assign the return value to client_socket
-
+		client_socket =  accept(server_socket,(struct sockaddr *)&client_address,client_address_length);
 		assert(client_socket != INVALID_SOCKET);
 
 		dfs_cm_client_req_t request;
 		//TODO: receive requests from client and fill it in request
-
+		recv(client_socket,&request,sizeof(request),0);
 		requests_dispatcher(client_socket, request);
 		close(client_socket);
 	}
@@ -37,6 +37,7 @@ int mainLoop(int server_socket)
 static void *heartbeatService()
 {
 	int socket_handle = create_server_tcp_socket(50030);
+	printf("heartbeat_socket : %i \n",socket_handle );
 	register_datanode(socket_handle);
 	close(socket_handle);
 	return 0;
@@ -50,6 +51,7 @@ static void *heartbeatService()
  */
 int start(int argc, char **argv)
 {
+	// printf("argc: %i \n",argc);
 	assert(argc == 2);
 	int i = 0;
 	for (i = 0; i < MAX_DATANODE_NUM; i++) dnlist[i] = NULL;
@@ -57,28 +59,40 @@ int start(int argc, char **argv)
 
 	//TODO:create a thread to handle heartbeat service
 	//you can implement the related function in dfs_common.c and call it here
-
+	create_thread(heartbeatService,NULL);
+	// heartbeatService();
 	int server_socket = INVALID_SOCKET;
 	//TODO: create a socket to listen the client requests and replace the value of server_socket with the socket's fd
-
+	server_socket = create_tcp_socket();
+	listen(server_socket,10);
 	assert(server_socket != INVALID_SOCKET);
 	return mainLoop(server_socket);
 }
 
 int register_datanode(int heartbeat_socket)
 {
+	printf("inside register_datanode\n");
 	for (;;)
 	{
 		int datanode_socket = -1;
+		struct sockaddr_in buffer;
+		int buffer_size = sizeof(buffer);
 		//TODO: accept connection from DataNodes and assign return value to datanode_socket;
+		printf("inside register_datanode, before accept\n");
+
+		datanode_socket = accept(heartbeat_socket,(struct sockaddr *)&buffer,&buffer_size);
+		
 		assert(datanode_socket != INVALID_SOCKET);
+		printf("inside register_datanode, datanode socket valid!\n");
 		dfs_cm_datanode_status_t datanode_status;
 		//TODO: receive datanode's status via datanode_socket
-
+		int recieve = recv(datanode_socket,&datanode_status,sizeof(datanode_status),0);
+		printf("inside register_datanode,recv = %i\n",recieve);
 		if (datanode_status.datanode_id < MAX_DATANODE_NUM)
 		{
 			//TODO: fill dnlist
 			//principle: a datanode with id of n should be filled in dnlist[n - 1] (n is always larger than 0)
+			memcpy(dnlist[datanode_status.datanode_id - 1],&datanode_status,sizeof(dnlist[datanode_status.datanode_id - 1]));
 			safeMode = 0;
 		}
 		close(datanode_socket);
