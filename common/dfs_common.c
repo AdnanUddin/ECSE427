@@ -60,8 +60,8 @@ int create_server_tcp_socket(int port)
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serv_addr.sin_port = htons(port);
-
 	bind(socket,(struct sockaddr*)&serv_addr,sizeof(serv_addr));
+	printf("binding success of sd: %i \n",socket);
 	if(listen(socket,10) == -1) {
 		printf("create_server_tcp_socket() fail listen\n");
 		return -1;
@@ -76,10 +76,13 @@ int create_server_tcp_socket(int port)
  */
 void send_data(int socket, void* data, int size)
 {
+	int data_size;
 	assert(data != NULL);
 	assert(size >= 0);
 	if (socket == INVALID_SOCKET) return;
 	//TODO: send data through socket
+	data_size = send(socket,data,size,0);
+	printf("data sent: %i \n",data_size);
 }
 
 /**
@@ -94,4 +97,6 @@ void receive_data(int socket, void* data, int size)
 	assert(size >= 0);
 	if (socket == INVALID_SOCKET) return;
 	//TODO: fetch data via socket
+	int data_received = recv(socket,data,size,0);
+	printf("data received: %i\n",data_received );
 }

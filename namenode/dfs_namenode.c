@@ -22,13 +22,15 @@ int mainLoop(int server_socket)
 		unsigned int client_address_length = sizeof(client_address);
 		int client_socket = -1;
 		//TODO: accept the connection from the client and assign the return value to client_socket
+		if(listen(server_socket,10) < 0 ) printf("listen(server_socket,10) < 0 \n");
 		client_socket =  accept(server_socket,(struct sockaddr *)&client_address,client_address_length);
 		assert(client_socket != INVALID_SOCKET);
 
 		dfs_cm_client_req_t request;
 		//TODO: receive requests from client and fill it in request
-		recv(client_socket,&request,sizeof(request),0);
+		receive_data(client_socket,&request,sizeof(request));
 		requests_dispatcher(client_socket, request);
+		printf("request.req_type : %i\n",request.req_type);
 		close(client_socket);
 	}
 	return 0;
@@ -51,7 +53,6 @@ static void *heartbeatService()
  */
 int start(int argc, char **argv)
 {
-	// printf("argc: %i \n",argc);
 	assert(argc == 2);
 	int i = 0;
 	for (i = 0; i < MAX_DATANODE_NUM; i++) dnlist[i] = NULL;
@@ -60,39 +61,37 @@ int start(int argc, char **argv)
 	//TODO:create a thread to handle heartbeat service
 	//you can implement the related function in dfs_common.c and call it here
 	create_thread(heartbeatService,NULL);
-	// heartbeatService();
+	printf("heartbeatService thread created\n");
 	int server_socket = INVALID_SOCKET;
 	//TODO: create a socket to listen the client requests and replace the value of server_socket with the socket's fd
 	server_socket = create_tcp_socket();
-	listen(server_socket,10);
+	server_socket = listen(server_socket,10);
 	assert(server_socket != INVALID_SOCKET);
 	return mainLoop(server_socket);
 }
 
 int register_datanode(int heartbeat_socket)
 {
-	printf("inside register_datanode\n");
 	for (;;)
 	{
 		int datanode_socket = -1;
 		struct sockaddr_in buffer;
 		int buffer_size = sizeof(buffer);
 		//TODO: accept connection from DataNodes and assign return value to datanode_socket;
-		printf("inside register_datanode, before accept\n");
-
+		printf("inside namenode register_datanode, before accept\n");
 		datanode_socket = accept(heartbeat_socket,(struct sockaddr *)&buffer,&buffer_size);
 		
 		assert(datanode_socket != INVALID_SOCKET);
-		printf("inside register_datanode, datanode socket valid!\n");
+		printf("inside namenode register_datanode, datanode socket valid!\n");
 		dfs_cm_datanode_status_t datanode_status;
 		//TODO: receive datanode's status via datanode_socket
-		int recieve = recv(datanode_socket,&datanode_status,sizeof(datanode_status),0);
-		printf("inside register_datanode,recv = %i\n",recieve);
+		receive_data(datanode_socket,&datanode_status,sizeof(datanode_status));
 		if (datanode_status.datanode_id < MAX_DATANODE_NUM)
 		{
 			//TODO: fill dnlist
 			//principle: a datanode with id of n should be filled in dnlist[n - 1] (n is always larger than 0)
-			memcpy(dnlist[datanode_status.datanode_id - 1],&datanode_status,sizeof(dnlist[datanode_status.datanode_id - 1]));
+			// memcpy(dnlist[datanode_status.datanode_id - 1],&datanode_status,sizeof(dnlist[datanode_status.datanode_id - 1]));
+			// printf("filled in dnlist[%i]\n", datanode_status.datanode_id -1);
 			safeMode = 0;
 		}
 		close(datanode_socket);
@@ -127,7 +126,8 @@ int get_file_receivers(int client_socket, dfs_cm_client_req_t request)
 		if (file_image == end_file_image) return 1;
 		// Create the file entry
 		*file_image = (dfs_cm_file_t*)malloc(sizeof(dfs_cm_file_t));
-		memset(*file_image, 0, sizeof(*file_image));
+		// memset(*file_image, 0, sizeof(*file_image));
+		memset(*file_image, 0, sizeof(**file_image));
 		strcpy((*file_image)->filename, request.file_name);
 		(*file_image)->file_size = request.file_size;
 		(*file_image)->blocknum = 0;

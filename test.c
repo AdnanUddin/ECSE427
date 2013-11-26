@@ -6,6 +6,7 @@
 //test connection between datanode and namenode
 int test_case_0(char **argv, int op_type)
 {
+	printf("inside test case 0\n");
 	dfs_system_status *sys_stat = NULL;
 	if ((sys_stat = send_sysinfo_request(argv)) == NULL) return 1;
 	if (sys_stat->datanode_num == 2) 
@@ -233,10 +234,16 @@ int test_case_6(char **argv, int op_type)
 
 int test_case_7(char **argv) 
 {
+	char **args = (char **) malloc(sizeof(char *) * 3);
+	args[0] = argv[0];
+	args[1] = argv[1];
+	args[2] = "local_file";
 	int r2 = test_case_2(argv, 1024);
-	int r6 = test_case_4(argv, 4096);
-	int r8	= test_case_6(argv, 8192);
-	return r2 || r6 || r8;
+	args[2] = "local_file_medium";
+	int r4 = test_case_4(argv, 4096);
+	args[2] = "local_file_large";
+	int r6 = test_case_6(argv, 8192);
+	return r2 || r4 || r6;
 }
 
 int test_case_8(char **argv, int op_type)

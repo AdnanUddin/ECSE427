@@ -43,7 +43,7 @@ int mainLoop()
 
 static void *heartbeat()
 {
-	printf("inside heartbeat\n");
+	printf("inside heartbeat in datanode\n");
 	dfs_cm_datanode_status_t datanode_status;
 	datanode_status.datanode_id = datanode_id;
 	datanode_status.datanode_listen_port = datanode_listen_port;
@@ -55,7 +55,7 @@ static void *heartbeat()
 		heartbeat_socket = create_client_tcp_socket("127.0.0.1",50030);
 		assert(heartbeat_socket != INVALID_SOCKET);
 		//send datanode_status to namenode
-		send(heartbeat_socket,&datanode_status,sizeof(datanode_status),0);
+		send_data(heartbeat_socket,&datanode_status,sizeof(datanode_status));
 		close(heartbeat_socket);
 		sleep(HEARTBEAT_INTERVAL);
 	}
