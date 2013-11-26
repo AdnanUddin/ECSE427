@@ -16,7 +16,6 @@ int mainLoop()
 	int server_socket = -1;
 	//TODO: create a server socket and listen on it, you can implement dfs_common.c and call it here
 	server_socket = create_server_tcp_socket(datanode_listen_port);
-	listen(server_socket,10);// not sure if necessary 
 	assert (server_socket != INVALID_SOCKET);
 
 	// Listen to requests from the clients
@@ -30,11 +29,9 @@ int mainLoop()
 		assert(client_socket != INVALID_SOCKET);
 		dfs_cli_dn_req_t request;
 		//TODO: receive data from client_socket, and fill it to request
-		char buffer[sizeof(request)];
-		recv(client_socket,buffer,sizeof(request),0);
+		receive_data(client_socket,&request,sizeof(request));
 
 		requests_dispatcher(client_socket, request);
-		memcpy(&request,buffer,sizeof(request));
 		close(client_socket);
 	}
 	close(server_socket);
@@ -55,7 +52,10 @@ static void *heartbeat()
 		heartbeat_socket = create_client_tcp_socket("127.0.0.1",50030);
 		assert(heartbeat_socket != INVALID_SOCKET);
 		//send datanode_status to namenode
+		printf("sending data from datanode\n");
+		printf("datanode heartbeat_socket: %i\n",heartbeat_socket);
 		send_data(heartbeat_socket,&datanode_status,sizeof(datanode_status));
+		printf("sent data from datanode!\n");
 		close(heartbeat_socket);
 		sleep(HEARTBEAT_INTERVAL);
 	}

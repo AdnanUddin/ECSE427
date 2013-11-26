@@ -22,8 +22,7 @@ int mainLoop(int server_socket)
 		unsigned int client_address_length = sizeof(client_address);
 		int client_socket = -1;
 		//TODO: accept the connection from the client and assign the return value to client_socket
-		if(listen(server_socket,10) < 0 ) printf("listen(server_socket,10) < 0 \n");
-		client_socket =  accept(server_socket,(struct sockaddr *)&client_address,client_address_length);
+		client_socket =  accept(server_socket,(struct sockaddr *)&client_address,(socklen_t *)client_address_length);
 		assert(client_socket != INVALID_SOCKET);
 
 		dfs_cm_client_req_t request;
@@ -38,6 +37,7 @@ int mainLoop(int server_socket)
 
 static void *heartbeatService()
 {
+	printf("heartbeat_socket creating ...\n");	
 	int socket_handle = create_server_tcp_socket(50030);
 	printf("heartbeat_socket : %i \n",socket_handle );
 	register_datanode(socket_handle);
@@ -79,19 +79,22 @@ int register_datanode(int heartbeat_socket)
 		int buffer_size = sizeof(buffer);
 		//TODO: accept connection from DataNodes and assign return value to datanode_socket;
 		printf("inside namenode register_datanode, before accept\n");
-		datanode_socket = accept(heartbeat_socket,(struct sockaddr *)&buffer,&buffer_size);
+		printf("namenode heartbeat_socket: %i\n",heartbeat_socket);
+		listen(heartbeat_socket,10);
+		datanode_socket = accept(heartbeat_socket,(struct sockaddr *)&buffer,(socklen_t*)&buffer_size);
 		
 		assert(datanode_socket != INVALID_SOCKET);
 		printf("inside namenode register_datanode, datanode socket valid!\n");
 		dfs_cm_datanode_status_t datanode_status;
 		//TODO: receive datanode's status via datanode_socket
 		receive_data(datanode_socket,&datanode_status,sizeof(datanode_status));
+		printf("received data in namenode\n");
 		if (datanode_status.datanode_id < MAX_DATANODE_NUM)
 		{
 			//TODO: fill dnlist
 			//principle: a datanode with id of n should be filled in dnlist[n - 1] (n is always larger than 0)
-			// memcpy(dnlist[datanode_status.datanode_id - 1],&datanode_status,sizeof(dnlist[datanode_status.datanode_id - 1]));
-			// printf("filled in dnlist[%i]\n", datanode_status.datanode_id -1);
+			memcpy(&dnlist[datanode_status.datanode_id - 1],&datanode_status,sizeof(dnlist[datanode_status.datanode_id - 1]));
+			printf("filled in dnlist[%i]\n", datanode_status.datanode_id -1);
 			safeMode = 0;
 		}
 		close(datanode_socket);
@@ -170,6 +173,9 @@ void get_system_information(int client_socket, dfs_cm_client_req_t request)
 	assert(client_socket != INVALID_SOCKET);
 	//TODO:fill the response and send back to the client
 	dfs_system_status response;
+	response.datanode_num = dncnt;
+	memcpy(&response.datanodes,dnlist,sizeof(response.datanodes));
+	send_data(client_socket,&response,sizeof(response));
 }
 
 int get_file_update_point(int client_socket, dfs_cm_client_req_t request)
