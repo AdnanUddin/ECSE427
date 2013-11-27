@@ -93,23 +93,19 @@ int register_datanode(int heartbeat_socket)
 		if (datanode_status.datanode_id < MAX_DATANODE_NUM)
 		{
 			dfs_datanode_t temp;
+			dnlist[n-1] = &temp;
 			//TODO: fill dnlist
 			//principle: a datanode with id of n should be filled in dnlist[n - 1] (n is always larger than 0)
 			int n = datanode_status.datanode_id;
 			char* ip = inet_ntoa(buffer.sin_addr);
 			printf("datanode id:%i ip:%s\n",n,ip );
-
 			// temp.dn_id = n;
 			strcpy(temp.ip,ip);
-			// temp.port = ntohs(buffer.sin_port);
-			dnlist[n-1]->dn_id = n;
-			dnlist[n-1]->port = ntohs(buffer.sin_port);
-			strcpy(dnlist[n-1]->ip,ip); 
-			// memcpy(dnlist[n-1],&temp,sizeof(temp));
-
-			printf("dnlist:%i ,%s\n",dnlist[n-1]->dn_id,dnlist[n-1]->ip );
-
-			// printf("filled in dnlist[%i]\n", datanode_status.datanode_id -1);
+			temp.dn_id = n;
+			printf("I am here!\n");
+			temp.port = ntohs(buffer.sin_port);
+			strcpy(temp.ip,ip); 
+			printf("temp.dn_id:%i\n",temp.dn_id);
 			safeMode = 0;
 		}
 		close(datanode_socket);
