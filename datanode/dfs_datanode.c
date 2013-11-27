@@ -25,7 +25,7 @@ int mainLoop()
 		int client_address_length = sizeof(client_address);
 		int client_socket = -1;
 		//TODO: accept the client request
-		client_socket = accept(datanode_listen_port,(struct sockaddr*)&client_address,&client_address_length);
+		client_socket = accept(server_socket,(struct sockaddr*)&client_address,&client_address_length);
 		assert(client_socket != INVALID_SOCKET);
 		dfs_cli_dn_req_t request;
 		//TODO: receive data from client_socket, and fill it to request

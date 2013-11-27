@@ -12,8 +12,6 @@ inline pthread_t * create_thread(void * (*entry_point)(void*), void *args)
 	pthread_t * thread = (pthread_t *)malloc(sizeof(thread));
 	pthread_create(thread,NULL,entry_point,args);
 
-	pthread_exit(0);
-
 	return thread;
 }
 
@@ -59,7 +57,7 @@ int create_server_tcp_socket(int port)
 	memset(&serv_addr,'0',sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	serv_addr.sin_port = htonl(port);
+	serv_addr.sin_port = htons(port);
 
 	int error = bind(socket,(struct sockaddr*)&serv_addr,sizeof(serv_addr));
 	if(error == -1) printf("error on bind\n");
