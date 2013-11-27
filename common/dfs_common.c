@@ -80,7 +80,7 @@ void send_data(int socket, void* data, int size)
 	assert(size >= 0);
 	if (socket == INVALID_SOCKET) return;
 	//TODO: send data through socket
-	data_size = send(socket,data,size,0);
+	data_size = write(socket,data,size);
 	printf("data sent: %i \n",data_size);
 }
 
@@ -96,7 +96,10 @@ void receive_data(int socket, void* data, int size)
 	assert(size >= 0);
 	if (socket == INVALID_SOCKET) return;
 	//TODO: fetch data via socket
-	printf("before recv \n");
-	int data_received = recv(socket,data,size,0);
+	int data_received = read(socket,data,size);
+	if(data_received < 0)
+	{
+		printf("Error in recieving for socket %i, size %i\n", socket,size);
+	}
 	printf("data received: %i\n",data_received );
 }
