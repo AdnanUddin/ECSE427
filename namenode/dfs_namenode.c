@@ -31,6 +31,7 @@ int mainLoop(int server_socket)
 		receive_data(client_socket,&request,sizeof(request));
 		requests_dispatcher(client_socket, request);
 		printf("request.req_type : %i\n",request.req_type);
+		send_data(client_socket,&request,sizeof(request));
 		close(client_socket);
 	}
 	return 0;
@@ -92,7 +93,8 @@ int register_datanode(int heartbeat_socket)
 		{
 			//TODO: fill dnlist
 			//principle: a datanode with id of n should be filled in dnlist[n - 1] (n is always larger than 0)
-			memcpy(&dnlist[datanode_status.datanode_id - 1],&datanode_status,sizeof(dnlist[datanode_status.datanode_id - 1]));
+			printf("datanode_status.datanode_id:%i \ndatanode_status.datanode_listen_port:%i\n",datanode_status.datanode_id,datanode_status.datanode_listen_port);
+			memcpy(dnlist[datanode_status.datanode_id - 1],&datanode_status,sizeof(dnlist[datanode_status.datanode_id - 1]));
 			printf("filled in dnlist[%i]\n", datanode_status.datanode_id -1);
 			safeMode = 0;
 		}
