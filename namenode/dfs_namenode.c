@@ -18,6 +18,7 @@ int mainLoop(int server_socket)
 
 	for (;;)
 	{
+		printf("in the mainloop!\n");
 		sockaddr_in client_address;
 		unsigned int client_address_length = sizeof(client_address);
 		int client_socket = -1;
@@ -31,8 +32,6 @@ int mainLoop(int server_socket)
 		receive_data(client_socket,&request,sizeof(request));
 		printf("recieved at namenode\n");
 		requests_dispatcher(client_socket, request);
-		// printf("request.req_type : %i\n",request.req_type);
-		// send_data(client_socket,&request,sizeof(request));
 		close(client_socket);
 	}
 	return 0;
@@ -66,7 +65,9 @@ int start(int argc, char **argv)
 	int server_socket = INVALID_SOCKET;
 	//TODO: create a socket to listen the client requests and replace the value of server_socket with the socket's fd
 	// printf("argv:%i\n", atoi(argv[1]));
+	printf("%s\n",argv[1]);
 	server_socket = create_server_tcp_socket(atoi(argv[1]));
+	printf("server_socket created\n");
 	assert(server_socket != INVALID_SOCKET);
 	return mainLoop(server_socket);
 }
@@ -85,27 +86,27 @@ int register_datanode(int heartbeat_socket)
 		datanode_socket = accept(heartbeat_socket,&buffer,(socklen_t*)&buffer_size);
 		
 		assert(datanode_socket != INVALID_SOCKET);
-		printf("inside namenode register_datanode, datanode socket valid!\n");
+		// printf("inside namenode register_datanode, datanode socket valid!\n");
 		dfs_cm_datanode_status_t datanode_status;
 		//TODO: receive datanode's status via datanode_socket
 		receive_data(datanode_socket,&datanode_status,sizeof(datanode_status));
+		printf("namenode recieved, datanode_status.datanode_id:%i\n",datanode_status.datanode_id);
 		// printf("received data in namenode\n");
 		if (datanode_status.datanode_id < MAX_DATANODE_NUM)
 		{
+			int n = datanode_status.datanode_id;
 			dfs_datanode_t temp;
-			dnlist[n-1] = &temp;
 			//TODO: fill dnlist
 			//principle: a datanode with id of n should be filled in dnlist[n - 1] (n is always larger than 0)
-			int n = datanode_status.datanode_id;
 			char* ip = inet_ntoa(buffer.sin_addr);
-			printf("datanode id:%i ip:%s\n",n,ip );
-			// temp.dn_id = n;
 			strcpy(temp.ip,ip);
 			temp.dn_id = n;
-			printf("I am here!\n");
 			temp.port = ntohs(buffer.sin_port);
 			strcpy(temp.ip,ip); 
-			printf("temp.dn_id:%i\n",temp.dn_id);
+			dnlist[n-1] = &temp;
+			// printf("temp.dn_id:%i,temp.port:%i,temp.ip:%s\n",temp.dn_id,temp.port,temp.ip );
+			// printf("dnlist[n-1].dn_id:%i",dnlist[n-1]->dn_id);
+			printf("safeMode is gonna be 0 !\n");
 			safeMode = 0;
 		}
 		close(datanode_socket);
