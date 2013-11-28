@@ -68,9 +68,10 @@ int start(int argc, char **argv)
 	int server_socket = INVALID_SOCKET;
 	//TODO: create a socket to listen the client requests and replace the value of server_socket with the socket's fd
 	printf("argv:%i\n", atoi(argv[1]));
+
+	// printf("argv:%i\n", atoi(argv[1]));
 	// printf("%s\n",argv[1]);
-	int port = atoi(argv[1]);
-	server_socket = create_server_tcp_socket(port);
+	server_socket = create_server_tcp_socket(atoi(argv[1]));
 	// printf("server_socket created\n");
 	assert(server_socket != INVALID_SOCKET);
 	printf("@start end in namenode\n");
@@ -93,11 +94,11 @@ int register_datanode(int heartbeat_socket)
 		//TODO: receive datanode's status via datanode_socket
 		printf("receive in register datanode\n");
 		receive_data(datanode_socket,&datanode_status,sizeof(dfs_cm_datanode_status_t));
+
 		printf("namenode recieved, datanode_status.datanode_id:%i\n",datanode_status.datanode_id);
 		// printf("received data in namenode\n");
 		if (datanode_status.datanode_id < MAX_DATANODE_NUM)
 		{
-			printf("int n = datanode_status.datanode_id;\n");
 			int n = datanode_status.datanode_id;
 			dfs_datanode_t temp;
 			//TODO: fill dnlist
@@ -115,7 +116,6 @@ int register_datanode(int heartbeat_socket)
 			}
 			
 			printf("datanode id %i, ip %s, port %i\n", dnlist[n-1]->dn_id, dnlist[n-1]->ip, dnlist[n-1]->port);		
-
 			safeMode = 0;
 		}
 		close(datanode_socket);

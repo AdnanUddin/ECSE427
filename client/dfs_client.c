@@ -81,9 +81,10 @@ dfs_system_status *get_system_info(int namenode_socket)
 	send_data(namenode_socket,&request,sizeof(request));
 	
 	//TODO: get the response
+
 	dfs_system_status *response =(dfs_system_status *) malloc(sizeof(dfs_system_status));
 	// printf("receiving response\n");
-	// receive_data(namenode_socket,response,sizeof(dfs_system_status));
+	receive_data(namenode_socket,response,sizeof(dfs_system_status));
 
 	return response;		
 }

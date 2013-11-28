@@ -31,6 +31,7 @@ int mainLoop()
 		//TODO: receive data from client_socket, and fill it to request
 		receive_data(client_socket,&request,sizeof(request));
 		printf("datanode received data from client_socket %i, request.op_type: %i\n",client_socket,request.op_type);
+
 		requests_dispatcher(client_socket, request);
 		close(client_socket);
 	}
@@ -51,6 +52,10 @@ static void *heartbeat()
 		heartbeat_socket = create_client_tcp_socket("127.0.0.1",50030);
 		assert(heartbeat_socket != INVALID_SOCKET);
 		//send datanode_status to namenode
+		// printf("sending data from datanode\n");
+		// printf("datanode heartbeat_socket: %i\n",heartbeat_socket);
+		// printf("datanode heartbeat datanode_status.datanode_id:%i\n",datanode_status.datanode_id);
+
 		send_data(heartbeat_socket,&datanode_status,sizeof(datanode_status));
 		close(heartbeat_socket);
 		sleep(HEARTBEAT_INTERVAL);
