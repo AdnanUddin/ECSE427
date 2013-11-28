@@ -9,7 +9,7 @@
 inline pthread_t * create_thread(void * (*entry_point)(void*), void *args)
 {
 	//TODO: create the thread and run it
-	pthread_t * thread = (pthread_t *)malloc(sizeof(thread));
+	pthread_t * thread = (pthread_t *)malloc(sizeof(pthread_t));
 	pthread_create(thread,NULL,entry_point,args);
 
 	return thread;
@@ -40,7 +40,7 @@ int create_client_tcp_socket(char* address, int port)
 	serv_addr.sin_port = htons(port);
 	serv_addr.sin_addr.s_addr = inet_addr(address);
 
-	connect(socket,(struct sockaddr *)&serv_addr,sizeof(serv_addr));
+	connect(socket,(struct sockaddr *)&serv_addr,sizeof(sockaddr_in));
 	return socket;
 }
 
@@ -59,9 +59,13 @@ int create_server_tcp_socket(int port)
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serv_addr.sin_port = htons(port);
 
-	int error = bind(socket,(struct sockaddr*)&serv_addr,sizeof(serv_addr));
-	if(error == -1) printf("error on bind\n");
-	if(listen(socket,10) == -1) {
+	int error = bind(socket,(sockaddr*)&serv_addr,sizeof(sockaddr_in));
+	if(error == -1) 
+	{
+		printf("error on bind: %i\n",error);
+		return -1;
+	}
+	if(listen(socket,5) == -1) {
 		printf("create_server_tcp_socket() fail listen\n");
 		return -1;
 	}
@@ -75,13 +79,17 @@ int create_server_tcp_socket(int port)
  */
 void send_data(int socket, void* data, int size)
 {
-	int data_size;
 	assert(data != NULL);
 	assert(size >= 0);
 	if (socket == INVALID_SOCKET) return;
 	//TODO: send data through socket
-	data_size = write(socket,data,size);
-	printf("data sent: %i \n",data_size);
+	printf("sending data from socket %i of size %i\n",socket,size );
+	int data_sent = 0;
+	while(data_sent - size < 0) 
+	{
+		data_sent = data_sent + write(socket,data + data_sent,size);
+	}
+	printf("data sent: %i \n",data_sent);
 }
 
 /**
@@ -96,7 +104,12 @@ void receive_data(int socket, void* data, int size)
 	assert(size >= 0);
 	if (socket == INVALID_SOCKET) return;
 	//TODO: fetch data via socket
-	int data_received = read(socket,data,size);
+	printf("receiving data from socket %i of size %i\n",socket,size);
+	int data_received = 0;
+	while(data_received - size < 0) 
+	{
+		data_received = data_received + write(socket,data + data_received,size);
+	}
 	if(data_received < 0)
 	{
 		printf("Error in recieving for socket %i, size %i\n", socket,size);

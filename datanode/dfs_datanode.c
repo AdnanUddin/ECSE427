@@ -22,15 +22,15 @@ int mainLoop()
 	for (;;)
 	{
 		sockaddr_in client_address;
-		int client_address_length = sizeof(client_address);
 		int client_socket = -1;
+		int client_address_length= sizeof(sockaddr_in);
 		//TODO: accept the client request
-		client_socket = accept(server_socket,(struct sockaddr*)&client_address,&client_address_length);
+		client_socket = accept(server_socket,(sockaddr*)&client_address,client_address_length);
 		assert(client_socket != INVALID_SOCKET);
 		dfs_cli_dn_req_t request;
 		//TODO: receive data from client_socket, and fill it to request
 		receive_data(client_socket,&request,sizeof(request));
-
+		printf("datanode received data from client_socket %i, request.op_type: %i\n",client_socket,request.op_type);
 		requests_dispatcher(client_socket, request);
 		close(client_socket);
 	}
@@ -40,7 +40,6 @@ int mainLoop()
 
 static void *heartbeat()
 {
-	// printf("inside heartbeat in datanode\n");
 	dfs_cm_datanode_status_t datanode_status;
 	datanode_status.datanode_id = datanode_id;
 	datanode_status.datanode_listen_port = datanode_listen_port;
@@ -52,10 +51,7 @@ static void *heartbeat()
 		heartbeat_socket = create_client_tcp_socket("127.0.0.1",50030);
 		assert(heartbeat_socket != INVALID_SOCKET);
 		//send datanode_status to namenode
-		// printf("sending data from datanode\n");
-		// printf("datanode heartbeat_socket: %i\n",heartbeat_socket);
 		send_data(heartbeat_socket,&datanode_status,sizeof(datanode_status));
-		// printf("sent data from datanode!\n");
 		close(heartbeat_socket);
 		sleep(HEARTBEAT_INTERVAL);
 	}
