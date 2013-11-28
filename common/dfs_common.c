@@ -60,7 +60,11 @@ int create_server_tcp_socket(int port)
 	serv_addr.sin_port = htons(port);
 
 	int error = bind(socket,(struct sockaddr*)&serv_addr,sizeof(serv_addr));
-	if(error == -1) printf("error on bind\n");
+	if(error == -1) 
+	{
+		printf("error on bind\n");
+		return -1;
+	}
 	if(listen(socket,10) == -1) {
 		printf("create_server_tcp_socket() fail listen\n");
 		return -1;

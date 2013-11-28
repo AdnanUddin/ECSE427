@@ -23,14 +23,14 @@ int mainLoop(int server_socket)
 		unsigned int client_address_length = sizeof(client_address);
 		int client_socket = -1;
 		//TODO: accept the connection from the client and assign the return value to client_socket
-		client_socket =  accept(server_socket,(struct sockaddr *)&client_address,client_address_length);
+		client_socket =  accept(server_socket,(struct sockaddr *)&client_address,&client_address_length);
 		assert(client_socket != INVALID_SOCKET);
-		printf("client_socket in mainloop namenode :%i\n", client_socket);
-		printf("server_socket in mainloop namenode :%i\n", server_socket);
+		// printf("client_socket in mainloop namenode :%i\n", client_socket);
+		// printf("server_socket in mainloop namenode :%i\n", server_socket);
 		dfs_cm_client_req_t request;
 		//TODO: receive requests from client and fill it in request
 		receive_data(client_socket,&request,sizeof(request));
-		printf("recieved at namenode\n");
+		// printf("recieved at namenode\n");
 		requests_dispatcher(client_socket, request);
 		close(client_socket);
 	}
@@ -40,7 +40,7 @@ int mainLoop(int server_socket)
 static void *heartbeatService()
 {
 	int socket_handle = create_server_tcp_socket(50030);
-	// printf("heartbeat_socket : %i \n",socket_handle );
+	printf("heartbeat_socket : %i \n",socket_handle );
 	register_datanode(socket_handle);
 	close(socket_handle);
 	return 0;
@@ -65,9 +65,9 @@ int start(int argc, char **argv)
 	int server_socket = INVALID_SOCKET;
 	//TODO: create a socket to listen the client requests and replace the value of server_socket with the socket's fd
 	// printf("argv:%i\n", atoi(argv[1]));
-	printf("%s\n",argv[1]);
+	// printf("%s\n",argv[1]);
 	server_socket = create_server_tcp_socket(atoi(argv[1]));
-	printf("server_socket created\n");
+	// printf("server_socket created\n");
 	assert(server_socket != INVALID_SOCKET);
 	return mainLoop(server_socket);
 }
@@ -104,9 +104,8 @@ int register_datanode(int heartbeat_socket)
 			temp.port = ntohs(buffer.sin_port);
 			strcpy(temp.ip,ip); 
 			dnlist[n-1] = &temp;
-			// printf("temp.dn_id:%i,temp.port:%i,temp.ip:%s\n",temp.dn_id,temp.port,temp.ip );
-			// printf("dnlist[n-1].dn_id:%i",dnlist[n-1]->dn_id);
-			printf("safeMode is gonna be 0 !\n");
+			printf("Registered datanode with id %i, ip %s, port %i\n", dnlist[n-1]->dn_id, dnlist[n-1]->ip, dnlist[n-1]->port);		
+
 			safeMode = 0;
 		}
 		close(datanode_socket);

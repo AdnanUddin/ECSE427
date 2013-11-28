@@ -29,8 +29,8 @@ int mainLoop()
 		assert(client_socket != INVALID_SOCKET);
 		dfs_cli_dn_req_t request;
 		//TODO: receive data from client_socket, and fill it to request
-		receive_data(server_socket,&request,sizeof(request));
-		printf("received data from client request, request.op_type: %i\n",request.op_type);
+		receive_data(client_socket,&request,sizeof(request));
+		// printf("received data from client request, request.op_type: %i\n",request.op_type);
 		requests_dispatcher(client_socket, request);
 		close(client_socket);
 	}
