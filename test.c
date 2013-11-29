@@ -20,10 +20,12 @@ int test_case_0(char **argv, int op_type)
 //write 
 int test_case_1(char **argv, int op_type)
 {
+	printf("inside test case 1\n");
 	if (send_file_request(argv, "local_file", 1) == -1) 
 	{
 		return 1;
 	}
+	printf("inside test case 1\n");
 	int ret = 0;
 	char * str_arr[1];
 	char *blk_0 = "d1/local_file_blk_0";
@@ -34,6 +36,7 @@ int test_case_1(char **argv, int op_type)
 	str_arr[0] = blk_0;
 	FILE *fp = fopen(str_arr[0], "rb");
 	if (fp == NULL) return 1;
+	printf("inside test case 1\n");
 	memset(buf, 0, DFS_BLOCK_SIZE);
 	memset(local_buf, 0, DFS_BLOCK_SIZE);
 	fread(buf, DFS_BLOCK_SIZE, 1, fp);
@@ -42,6 +45,7 @@ int test_case_1(char **argv, int op_type)
 	{
 		ret = 1;
 	}
+	printf("inside test case 1\n");
 	fclose(fp);
 	free(buf);
 	free(local_buf);

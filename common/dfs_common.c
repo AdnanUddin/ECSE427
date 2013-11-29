@@ -60,7 +60,7 @@ int create_server_tcp_socket(int port)
 	serv_addr.sin_port = htons(port);
 
 	int error = bind(socket,(sockaddr*)&serv_addr,sizeof(sockaddr_in));
-	if(error == -1) 
+	if(error < 0) 
 	{
 		printf("error on bind: %i\n",error);
 		return -1;
@@ -85,11 +85,11 @@ void send_data(int socket, void* data, int size)
 	//TODO: send data through socket
 	printf("sending data from socket %i of size %i\n",socket,size );
 	int data_sent = 0;
-	while(data_sent - size < 0) 
+	while(data_sent < size ) 
 	{
 		data_sent = data_sent + write(socket,data + data_sent,size);
+		printf("data sent: %i \n",data_sent);
 	}
-	printf("data sent: %i \n",data_sent);
 }
 
 /**
@@ -106,13 +106,13 @@ void receive_data(int socket, void* data, int size)
 	//TODO: fetch data via socket
 	printf("receiving data from socket %i of size %i\n",socket,size);
 	int data_received = 0;
-	while(data_received - size < 0) 
+	while(data_received  < size) 
 	{
-		data_received = data_received + write(socket,data + data_received,size);
+		data_received = data_received + read(socket,data + data_received,size);
 	}
 	if(data_received < 0)
 	{
 		printf("Error in recieving for socket %i, size %i\n", socket,size);
 	}
-	printf("data received: %i\n",data_received );
+	// printf("data received: %i\n",data_received );
 }

@@ -42,6 +42,7 @@ int mainLoop()
 static void *heartbeat()
 {
 	dfs_cm_datanode_status_t datanode_status;
+	memset(&datanode_status,'0',sizeof(dfs_cm_datanode_status_t));
 	datanode_status.datanode_id = datanode_id;
 	datanode_status.datanode_listen_port = datanode_listen_port;
 
@@ -53,8 +54,8 @@ static void *heartbeat()
 		assert(heartbeat_socket != INVALID_SOCKET);
 		//send datanode_status to namenode
 		// printf("sending data from datanode\n");
-		// printf("datanode heartbeat_socket: %i\n",heartbeat_socket);
-		// printf("datanode heartbeat datanode_status.datanode_id:%i\n",datanode_status.datanode_id);
+		// printf("@datanode datanode_status.datanode_id: %i\n",datanode_id);
+		// printf("@datanode heartbeat datanode_status.datanode_id:%i\n",datanode_status.datanode_id);
 
 		send_data(heartbeat_socket,&datanode_status,sizeof(datanode_status));
 		close(heartbeat_socket);
@@ -91,12 +92,15 @@ int read_block(int client_socket, const dfs_cli_dn_req_t *request)
 	char buffer[DFS_BLOCK_SIZE];
 	ext_read_block(request->block.owner_name, request->block.block_id, (void *)buffer);
 	//TODO:response the client with the data
+	send_data(client_socket,buffer,DFS_BLOCK_SIZE);
+
 	return 0;
 }
 
 int create_block(const dfs_cli_dn_req_t* request)
 {
 	ext_write_block(request->block.owner_name, request->block.block_id, (void *)request->block.content);
+	printf("wrote on disk!\n");
 	return 0;
 }
 
@@ -109,6 +113,7 @@ void requests_dispatcher(int client_socket, dfs_cli_dn_req_t request)
 			break;
 		case 1:
 			create_block(&request);
+			printf("block created!\n");
 			break;
 	}
 }
